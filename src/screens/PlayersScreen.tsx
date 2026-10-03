@@ -6,6 +6,7 @@ import { ScrollArea } from '../components/ScrollArea'
 import { useT } from '../i18n/LocaleProvider'
 import { todayISO } from '../game/persistence'
 import { PLAYER_COLORS, getPlayerColor } from '../lib/playerColors'
+import { getCleanPlayerName, SPECIAL_PLAYER_FLAG } from '../lib/playerProfiles'
 
 type Props = {
   players: string[]
@@ -36,13 +37,30 @@ export function PlayersScreen({
 }: Props) {
   const t = useT()
   const [name, setName] = useState('')
+  const [hasFlagPending, setHasFlagPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [activePickerIndex, setActivePickerIndex] = useState<number | null>(null)
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value
+    if (raw.includes(SPECIAL_PLAYER_FLAG)) {
+      setHasFlagPending(true)
+      // Strip flag immediately so it is never displayed in the input field
+      setName(raw.replaceAll(SPECIAL_PLAYER_FLAG, ''))
+    } else {
+      setName(raw)
+    }
+    if (error) setError(null)
+  }
+
   const submit = () => {
-    const trimmed = name.trim()
-    if (!trimmed) return
-    if (players.some((p) => p.toLowerCase() === trimmed.toLowerCase())) {
+    const clean = name.trim()
+    if (!clean) return
+
+    // Store internal marker if user enabled the tag, while keeping display clean
+    const nameToStore = hasFlagPending ? `${clean}${SPECIAL_PLAYER_FLAG}` : clean
+
+    if (players.some((p) => getCleanPlayerName(p).toLowerCase() === clean.toLowerCase())) {
       setError(t('players.duplicate'))
       return
     }
@@ -50,8 +68,9 @@ export function PlayersScreen({
     // Find next unassigned color from palette
     const usedColors = new Set(players.map((p, idx) => playerColors[p] ?? getPlayerColor(undefined, idx)))
     const unused = PLAYER_COLORS.find((c) => !usedColors.has(c.hex)) ?? PLAYER_COLORS[players.length % PLAYER_COLORS.length]
-    onAdd(trimmed, unused.hex)
+    onAdd(nameToStore, unused.hex)
     setName('')
+    setHasFlagPending(false)
   }
 
   const canContinue = players.length >= MIN_PLAYERS
@@ -97,9 +116,9 @@ export function PlayersScreen({
                   className="w-8 h-8 rounded-full border-2 border-white/20 mr-3 shrink-0 press-ios shadow-sm flex items-center justify-center transition-transform hover:scale-105"
                   style={{ backgroundColor: color }}
                   title="Choose color"
-                  aria-label={`Change color for ${p}`}
+                  aria-label={`Change color for ${getCleanPlayerName(p)}`}
                 />
-                <span className="flex-1 font-semibold truncate text-white">{p}</span>
+                <span className="flex-1 font-semibold truncate text-white">{getCleanPlayerName(p)}</span>
                 <button
                   onClick={() => {
                     if (activePickerIndex === i) setActivePickerIndex(null)
@@ -157,10 +176,7 @@ export function PlayersScreen({
             <input
               name="playerName"
               value={name}
-              onChange={(e) => {
-                setName(e.target.value)
-                if (error) setError(null)
-              }}
+              onChange={handleNameChange}
               placeholder={t('players.placeholder')}
               className={
                 `flex-1 bg-card border rounded-2xl px-4 h-12 text-white placeholder:text-white/40 outline-none ` +

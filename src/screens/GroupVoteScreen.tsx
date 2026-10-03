@@ -3,6 +3,7 @@ import { Screen } from '../components/Screen'
 import { Button } from '../components/Button'
 import { ScrollArea } from '../components/ScrollArea'
 import { useT } from '../i18n/LocaleProvider'
+import { getCleanPlayerName } from '../lib/playerProfiles'
 
 type Props = {
   players: string[]
@@ -48,7 +49,7 @@ export function GroupVoteScreen({ players, onConfirm }: Props) {
                 (isSel ? 'bg-accent text-ink border-accent' : 'bg-card text-white border-line')
               }
             >
-              {name}
+              {getCleanPlayerName(name)}
             </button>
           )
         })}

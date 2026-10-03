@@ -3,6 +3,7 @@ import { Button } from '../components/Button'
 import { ExitRoundButton } from '../components/ExitRoundButton'
 import { useT } from '../i18n/LocaleProvider'
 import { getPlayerColor } from '../lib/playerColors'
+import { getCleanPlayerName } from '../lib/playerProfiles'
 
 type Props = {
   name: string
@@ -61,7 +62,7 @@ export function HandoffScreen({
                 className="w-3 h-3 rounded-full shadow-sm ring-2 ring-white/20"
                 style={{ backgroundColor: color }}
               />
-              <span className="text-xl font-extrabold tracking-tight">{name}</span>
+              <span className="text-xl font-extrabold tracking-tight">{getCleanPlayerName(name)}</span>
             </div>
           </div>
 

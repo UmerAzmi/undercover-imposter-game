@@ -8,6 +8,7 @@ import type { Settings } from '../game/types'
 import { forceRefresh } from '../lib/force-refresh'
 import { THEMES } from '../lib/theme'
 import { getPlayerColor } from '../lib/playerColors'
+import { getCleanPlayerName } from '../lib/playerProfiles'
 import { ScrollArea } from '../components/ScrollArea'
 
 type Props = {
@@ -88,7 +89,7 @@ export function SettingsScreen({
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-line/70 border border-white/10"
                       >
                         <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: col }} />
-                        <span className="truncate max-w-[120px]">{p}</span>
+                        <span className="truncate max-w-[120px]">{getCleanPlayerName(p)}</span>
                       </span>
                     )
                   })}

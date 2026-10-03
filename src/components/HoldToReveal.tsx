@@ -11,12 +11,17 @@ type Props = {
   onFullyRevealed?: () => void
   /** Custom wave fill color during the hold */
   fillColor?: string
+  /** Callback fired when a swipe gesture is detected while holding and revealed */
+  onSwipe?: (direction: 'horizontal' | 'vertical', subDir: 'left' | 'right' | 'up' | 'down') => void
 }
 
-export function HoldToReveal({ prompt, children, onFullyRevealed, fillColor }: Props) {
+export function HoldToReveal({ prompt, children, onFullyRevealed, fillColor, onSwipe }: Props) {
   const [revealed, setRevealed] = useState(false)
   const [holding, setHolding] = useState(false)
   const timeoutRef = useRef<number | null>(null)
+  const startXRef = useRef<number>(0)
+  const startYRef = useRef<number>(0)
+  const hasSwipedInHoldRef = useRef(false)
 
   const clearPending = () => {
     if (timeoutRef.current !== null) {
@@ -29,6 +34,7 @@ export function HoldToReveal({ prompt, children, onFullyRevealed, fillColor }: P
     clearPending()
     setHolding(false)
     setRevealed(false)
+    hasSwipedInHoldRef.current = false
   }
 
   useEffect(() => () => clearPending(), [])
@@ -36,6 +42,9 @@ export function HoldToReveal({ prompt, children, onFullyRevealed, fillColor }: P
   const onDown = (e: React.PointerEvent) => {
     e.preventDefault()
     e.currentTarget.setPointerCapture?.(e.pointerId)
+    startXRef.current = e.clientX
+    startYRef.current = e.clientY
+    hasSwipedInHoldRef.current = false
     clearPending()
     setHolding(true)
     // setTimeout fires reliably on iOS Safari even when rAF is throttled during
@@ -51,11 +60,23 @@ export function HoldToReveal({ prompt, children, onFullyRevealed, fillColor }: P
     }, HOLD_MS)
   }
 
+  const onMove = (e: React.PointerEvent) => {
+    if (!holding || !revealed || hasSwipedInHoldRef.current) return
+    const deltaX = e.clientX - startXRef.current
+
+    // Deliberate threshold (55px) and latched so a single swipe only fires once
+    if (Math.abs(deltaX) > 55) {
+      hasSwipedInHoldRef.current = true
+      onSwipe?.('horizontal', deltaX > 0 ? 'right' : 'left')
+    }
+  }
+
   const onUp = () => cancel()
 
   return (
     <div
       onPointerDown={onDown}
+      onPointerMove={onMove}
       onPointerUp={onUp}
       onPointerCancel={onUp}
       onPointerLeave={onUp}

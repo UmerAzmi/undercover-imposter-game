@@ -4,6 +4,7 @@ import { ExitRoundButton } from '../components/ExitRoundButton'
 import { ScrollArea } from '../components/ScrollArea'
 import { useLocale } from '../i18n/LocaleProvider'
 import { getPlayerColor } from '../lib/playerColors'
+import { getCleanPlayerName } from '../lib/playerProfiles'
 
 type Props = {
   categoryId: string
@@ -27,6 +28,7 @@ export function PlayScreen({
   const { bundle } = useLocale()
   const meta = bundle?.categories[categoryId]
   const color = getPlayerColor(starterColor)
+  const cleanStarterName = getCleanPlayerName(starterName)
 
   return (
     <Screen
@@ -73,7 +75,7 @@ export function PlayScreen({
                   color: '#ffffff',
                 }}
               >
-                {starterName.charAt(0).toUpperCase()}
+                {cleanStarterName.charAt(0).toUpperCase()}
               </div>
             </div>
 
@@ -81,7 +83,7 @@ export function PlayScreen({
               className="text-3xl sm:text-4xl font-black tracking-tight drop-shadow-sm"
               style={{ color }}
             >
-              {starterName}
+              {cleanStarterName}
             </h1>
 
             <p className="text-sm font-semibold text-white/80">
@@ -105,7 +107,7 @@ export function PlayScreen({
                 1
               </span>
               <p>
-                Begin with <strong className="text-white" style={{ color }}>{starterName}</strong>, then proceed <strong>clockwise</strong> around the circle.
+                Begin with <strong className="text-white" style={{ color }}>{cleanStarterName}</strong>, then proceed <strong>clockwise</strong> around the circle.
               </p>
             </div>
 

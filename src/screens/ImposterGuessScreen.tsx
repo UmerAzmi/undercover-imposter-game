@@ -3,6 +3,7 @@ import { Screen } from '../components/Screen'
 import { Button } from '../components/Button'
 import { ScrollArea } from '../components/ScrollArea'
 import { useT } from '../i18n/LocaleProvider'
+import { getCleanPlayerName } from '../lib/playerProfiles'
 import type { CategoryWord } from '../game/types'
 
 type Props = {
@@ -25,7 +26,7 @@ export function ImposterGuessScreen({ imposterName, words, onGuess }: Props) {
     >
       <div className="text-center pt-3 pb-2">
         <p className="text-white/50 text-sm uppercase tracking-widest">{t('guess.youAre')}</p>
-        <h2 className="text-2xl font-bold mt-1">{imposterName}</h2>
+        <h2 className="text-2xl font-bold mt-1">{getCleanPlayerName(imposterName)}</h2>
         <p className="text-white/70 mt-3 leading-snug max-w-xs mx-auto">{t('guess.prompt')}</p>
       </div>
 

@@ -3,6 +3,7 @@ import { Screen } from '../components/Screen'
 import { Button } from '../components/Button'
 import { ScrollArea } from '../components/ScrollArea'
 import { useT } from '../i18n/LocaleProvider'
+import { getCleanPlayerName } from '../lib/playerProfiles'
 
 type Props = {
   voterName: string
@@ -29,7 +30,7 @@ export function VoteScreen({ voterName, voterIndex, players, candidateIndices, o
     >
       <div className="text-center pt-4 pb-3">
         <p className="text-white/50 text-sm uppercase tracking-widest">{t('vote.youAre')}</p>
-        <h2 className="text-2xl font-bold mt-1">{voterName}</h2>
+        <h2 className="text-2xl font-bold mt-1">{getCleanPlayerName(voterName)}</h2>
         <p className="text-white/60 mt-3">{t('vote.prompt')}</p>
       </div>
 
@@ -53,7 +54,7 @@ export function VoteScreen({ voterName, voterIndex, players, candidateIndices, o
                 (isSel ? 'bg-accent text-ink border-accent' : 'bg-card text-white border-line')
               }
             >
-              {players[i]}
+              {getCleanPlayerName(players[i])}
             </button>
           )
         })}

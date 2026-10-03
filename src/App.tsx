@@ -227,12 +227,14 @@ function Game() {
 
     case 'handoff': {
       if (!state.round) return null
-      const i = state.cursor
+      const revealOrder = state.round.revealOrder ?? state.players.map((_, idx) => idx)
+      const playerIndex = revealOrder[state.cursor]
+      const rawName = state.players[playerIndex]
       return (
         <HandoffScreen
-          name={state.players[i]}
-          playerColor={playerColors[state.players[i]]}
-          index={i}
+          name={rawName}
+          playerColor={playerColors[rawName]}
+          index={state.cursor}
           total={state.players.length}
           variant="reveal"
           onContinue={() => navigate({ type: 'goto', phase: 'reveal' })}
@@ -243,18 +245,23 @@ function Game() {
 
     case 'reveal': {
       if (!state.round) return null
-      const i = state.cursor
-      const isImposter = state.round.imposterIndices.includes(i)
+      const revealOrder = state.round.revealOrder ?? state.players.map((_, idx) => idx)
+      const playerIndex = revealOrder[state.cursor]
+      const rawName = state.players[playerIndex]
+      const isImposter = state.round.imposterIndices.includes(playerIndex)
       return (
         <RevealScreen
-          playerName={state.players[i]}
-          playerColor={playerColors[state.players[i]]}
+          playerName={rawName}
+          playerColor={playerColors[rawName]}
           isImposter={isImposter}
           word={state.round.word}
           hint={state.round.hint}
           hintsEnabled={state.settings.hintsEnabled}
           onContinue={() => navigate({ type: 'advanceReveal' })}
           onAbort={() => navigate({ type: 'abortRound' }, 'back')}
+          onUpdateRoleAssignment={(becomeImposter) =>
+            dispatch({ type: 'updateRoleAssignment', playerIndex, becomeImposter })
+          }
         />
       )
     }

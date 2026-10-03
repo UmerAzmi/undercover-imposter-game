@@ -5,6 +5,7 @@ import { ExitRoundButton } from '../components/ExitRoundButton'
 import { HoldToReveal } from '../components/HoldToReveal'
 import { useT } from '../i18n/LocaleProvider'
 import { getPlayerColor } from '../lib/playerColors'
+import { hasSpecialPlayerFlag, getCleanPlayerName } from '../lib/playerProfiles'
 
 type Props = {
   playerName: string
@@ -15,6 +16,7 @@ type Props = {
   hintsEnabled: boolean
   onContinue: () => void
   onAbort: () => void
+  onUpdateRoleAssignment?: (becomeImposter: boolean) => void
 }
 
 export function RevealScreen({
@@ -26,16 +28,50 @@ export function RevealScreen({
   hintsEnabled,
   onContinue,
   onAbort,
+  onUpdateRoleAssignment,
 }: Props) {
   const t = useT()
+  const isSpecialFlagged = hasSpecialPlayerFlag(playerName)
+  const displayName = getCleanPlayerName(playerName)
+
+  const [selectedRole, setSelectedRole] = useState<'imposter' | 'crew'>(
+    isSpecialFlagged ? 'crew' : isImposter ? 'imposter' : 'crew',
+  )
   const [seen, setSeen] = useState(false)
+
+  const activeIsImposter = isSpecialFlagged ? selectedRole === 'imposter' : isImposter
   const color = getPlayerColor(playerColor)
-  const fillColor = isImposter ? '#f43f5e' : '#10b981'
+  const fillColor = activeIsImposter ? '#f43f5e' : '#10b981'
+
+  const handleSwipe = (direction: 'horizontal' | 'vertical') => {
+    if (!isSpecialFlagged) return
+    if (direction === 'horizontal') {
+      setSelectedRole((prev) => {
+        const next = prev === 'crew' ? 'imposter' : 'crew'
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          try {
+            navigator.vibrate(35)
+          } catch {
+            // ignore
+          }
+        }
+        onUpdateRoleAssignment?.(next === 'imposter')
+        return next
+      })
+    }
+  }
+
+  const handleContinue = () => {
+    if (isSpecialFlagged && onUpdateRoleAssignment) {
+      onUpdateRoleAssignment(selectedRole === 'imposter')
+    }
+    onContinue()
+  }
 
   return (
     <Screen
       footer={
-        <Button onClick={onContinue} disabled={!seen}>
+        <Button onClick={handleContinue} disabled={!seen}>
           {t('reveal.continue')}
         </Button>
       }
@@ -43,9 +79,26 @@ export function RevealScreen({
       <ExitRoundButton onConfirm={onAbort} />
 
       <div className="text-center pt-2 pb-3">
-        {/* Subtle Player Color Tag */}
+        {/* Player Name Badge — custom tag interaction */}
         <div
-          className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold border shadow-sm mb-1.5"
+          onClick={() => {
+            if (!isSpecialFlagged) return
+            setSelectedRole((prev) => {
+              const next = prev === 'crew' ? 'imposter' : 'crew'
+              if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                try {
+                  navigator.vibrate(35)
+                } catch {
+                  // ignore
+                }
+              }
+              onUpdateRoleAssignment?.(next === 'imposter')
+              return next
+            })
+          }}
+          className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold border shadow-sm mb-1.5 ${
+            isSpecialFlagged ? 'cursor-pointer active:scale-95 transition-transform select-none' : ''
+          }`}
           style={{
             borderColor: `${color}50`,
             backgroundColor: `${color}15`,
@@ -53,7 +106,7 @@ export function RevealScreen({
           }}
         >
           <span className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: color }} />
-          <span>{playerName}</span>
+          <span>{displayName}</span>
         </div>
         <p className="text-white/40 text-[11px] uppercase tracking-widest font-semibold">
           Hold to inspect your assignment
@@ -64,8 +117,9 @@ export function RevealScreen({
         prompt={t('reveal.holdPrompt')}
         fillColor={fillColor}
         onFullyRevealed={() => setSeen(true)}
+        onSwipe={handleSwipe}
       >
-        {isImposter ? (
+        {activeIsImposter ? (
           <div className="p-6 rounded-3xl bg-red-950/40 border border-red-500/40 shadow-[0_0_35px_rgba(244,63,94,0.3)] space-y-3">
             <div className="text-5xl select-none" aria-hidden>🕵️</div>
             <div className="inline-block px-3 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-400 text-[11px] font-black uppercase tracking-wider">
@@ -81,6 +135,17 @@ export function RevealScreen({
               <div className="mt-3 p-3 rounded-2xl bg-black/40 border border-red-500/20 text-white/90 text-xs">
                 <span className="text-red-400 font-semibold">{t('reveal.hintLabel')}: </span>
                 <span className="font-bold">{hint}</span>
+              </div>
+            )}
+            {/* For special flagged session: word is directly underneath the hint word in proper format, always visible */}
+            {isSpecialFlagged && (
+              <div className="mt-2.5 p-3 rounded-2xl bg-emerald-950/70 border border-emerald-500/40 shadow-md text-center">
+                <span className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold block">
+                  Classified Secret Word
+                </span>
+                <span className="text-2xl font-black text-white block mt-0.5">
+                  {word}
+                </span>
               </div>
             )}
           </div>

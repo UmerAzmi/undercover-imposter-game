@@ -49,6 +49,8 @@ export type Round = {
   starterIndex: number
   votes: (number | null)[]
   tieRevoteAmong: number[] | null
+  /** Order in which players reveal their cards to ensure smooth pass-and-play role distribution. */
+  revealOrder?: number[]
 }
 
 export type Phase =

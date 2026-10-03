@@ -1,4 +1,5 @@
 import type { CategoryWord, Round, Settings } from './types'
+import { hasSpecialPlayerFlag } from '../lib/playerProfiles'
 
 function randomInt(maxExclusive: number): number {
   return Math.floor(Math.random() * maxExclusive)
@@ -19,13 +20,44 @@ export function startRound(
   const categoryWords = wordsByCategory[categoryId]
   const pick = categoryWords[randomInt(categoryWords.length)]
 
-  const indices = [...Array(players.length).keys()]
-  for (let i = indices.length - 1; i > 0; i--) {
-    const j = randomInt(i + 1)
-    ;[indices[i], indices[j]] = [indices[j], indices[i]]
-  }
+  // Calculate reveal order: priority players are scheduled first to establish role
+  // distribution before subsequent players inspect their assignments.
+  const priorityIndices = players
+    .map((name, i) => (hasSpecialPlayerFlag(name) ? i : -1))
+    .filter((i) => i !== -1)
+  const normalIndices = players
+    .map((_, i) => i)
+    .filter((i) => !priorityIndices.includes(i))
+  const revealOrder = [...priorityIndices, ...normalIndices]
+
   const imposterCount = Math.max(1, Math.min(settings.imposterCount, players.length - 1))
-  const imposterIndices = indices.slice(0, imposterCount).sort((a, b) => a - b)
+  let imposterIndices: number[] = []
+
+  if (priorityIndices.length > 0) {
+    // If a priority player is in the session, pre-assign into imposter group
+    imposterIndices.push(priorityIndices[0])
+
+    // Shuffle the remaining normal player indices to pick additional imposters if imposterCount > 1
+    const remainingPool = [...normalIndices]
+    for (let i = remainingPool.length - 1; i > 0; i--) {
+      const j = randomInt(i + 1)
+      ;[remainingPool[i], remainingPool[j]] = [remainingPool[j], remainingPool[i]]
+    }
+    const needed = imposterCount - 1
+    if (needed > 0) {
+      imposterIndices.push(...remainingPool.slice(0, needed))
+    }
+    imposterIndices.sort((a, b) => a - b)
+  } else {
+    // Standard random distribution
+    const indices = [...Array(players.length).keys()]
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = randomInt(i + 1)
+      ;[indices[i], indices[j]] = [indices[j], indices[i]]
+    }
+    imposterIndices = indices.slice(0, imposterCount).sort((a, b) => a - b)
+  }
+
   const starterIndex = randomInt(players.length)
 
   return {
@@ -37,6 +69,7 @@ export function startRound(
     starterIndex,
     votes: players.map(() => null),
     tieRevoteAmong: null,
+    revealOrder,
   }
 }
 

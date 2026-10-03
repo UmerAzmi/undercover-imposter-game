@@ -1,6 +1,7 @@
 import { Screen } from '../components/Screen'
 import { Button } from '../components/Button'
 import { useT } from '../i18n/LocaleProvider'
+import { getCleanPlayerName } from '../lib/playerProfiles'
 import type { SessionScore, Winner } from '../game/types'
 
 type Props = {
@@ -41,7 +42,7 @@ export function RoundEndScreen({
         </div>
         {imposterNames.length > 0 && (
           <p className="text-white/60 max-w-xs text-sm">
-            {t('roundEnd.imposterWas', { names: imposterNames.join(', ') })}
+            {t('roundEnd.imposterWas', { names: imposterNames.map((n) => getCleanPlayerName(n)).join(', ') })}
           </p>
         )}
 

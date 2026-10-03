@@ -1,6 +1,7 @@
 import { Screen } from '../components/Screen'
 import { Button } from '../components/Button'
 import { useT } from '../i18n/LocaleProvider'
+import { getCleanPlayerName } from '../lib/playerProfiles'
 
 type Props = {
   eliminatedName: string
@@ -17,7 +18,7 @@ export function ResultScreen({ eliminatedName, imposterNames, wasImposter, onCon
         <div className="text-7xl" aria-hidden>{wasImposter ? '🎯' : '😮'}</div>
         <p className="text-white/60 uppercase tracking-widest text-xs">{t('result.mostVoted')}</p>
         <h1 className="text-4xl font-extrabold tracking-tight break-words max-w-full">
-          {eliminatedName}
+          {getCleanPlayerName(eliminatedName)}
         </h1>
         <div
           className={`mt-4 px-4 py-3 rounded-2xl font-bold text-lg ${
@@ -28,7 +29,7 @@ export function ResultScreen({ eliminatedName, imposterNames, wasImposter, onCon
         </div>
         {!wasImposter && imposterNames.length > 0 && (
           <p className="text-white/60 mt-2 max-w-xs">
-            {t('result.imposterWere', { names: imposterNames.join(', ') })}
+            {t('result.imposterWere', { names: imposterNames.map((n) => getCleanPlayerName(n)).join(', ') })}
           </p>
         )}
       </div>

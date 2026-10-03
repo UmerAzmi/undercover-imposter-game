@@ -1,6 +1,7 @@
 import type { CategoryWord, GameState, Round, Settings, Winner } from './types'
 import { startRound, tallyVotes } from './round'
 import { loadCategories, loadLastPlayed, loadPlayers, loadSettings, recommendedRoundSeconds, saveLastPlayed, todayISO } from './persistence'
+import { rebalanceRoleAssignments } from '../lib/playerProfiles'
 
 type Action =
   | { type: 'goto'; phase: GameState['phase'] }
@@ -18,6 +19,7 @@ type Action =
   | { type: 'imposterGuess'; word: string }
   | { type: 'reset' }
   | { type: 'abortRound' }
+  | { type: 'updateRoleAssignment'; playerIndex: number; becomeImposter: boolean }
 
 export type { Action }
 
@@ -107,6 +109,28 @@ export function reducer(state: GameState, action: Action): GameState {
         resultMostVoted: null,
         winner: null,
         lastPlayed: today,
+      }
+    }
+
+    case 'updateRoleAssignment': {
+      if (!state.round) return state
+      const { playerIndex, becomeImposter } = action
+      const revealOrder = state.round.revealOrder ?? state.players.map((_, i) => i)
+      const unrevealedIndices = revealOrder.slice(state.cursor + 1)
+      const nextImposters = rebalanceRoleAssignments({
+        playerIndex,
+        becomeImposter,
+        currentImposters: state.round.imposterIndices,
+        totalPlayers: state.players.length,
+        imposterCount: state.settings.imposterCount,
+        unrevealedIndices,
+      })
+      return {
+        ...state,
+        round: {
+          ...state.round,
+          imposterIndices: nextImposters,
+        },
       }
     }
 
