@@ -1,4 +1,4 @@
-# Imposter
+# Imposter Game
 
 A single-device "find the imposter" party game built by **Umer Azmi**. Pass the phone around: everyone holds to reveal their secret word, except one player who sees `IMPOSTER` and has to bluff. After the round timer, vote anonymously and unmask them.
 
