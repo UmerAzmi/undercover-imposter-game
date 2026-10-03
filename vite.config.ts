@@ -45,9 +45,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon-32.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maskable.png'],
       manifest: {
-        name: 'Imposter',
-        short_name: 'Imposter',
-        description: 'An offline find-the-imposter party game for a single device.',
+        name: 'Undercover: The Imposter Game',
+        short_name: 'Undercover',
+        description: 'Find who is undercover! An offline pass-and-play social deduction party game.',
         theme_color: '#0b0d12',
         background_color: '#0b0d12',
         display: 'standalone',

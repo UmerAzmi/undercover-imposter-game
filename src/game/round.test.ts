@@ -10,7 +10,7 @@ const SETTINGS: Settings = {
   voteMode: 'individual',
   soundEnabled: true,
   hapticsEnabled: true,
-  theme: 'rose',
+  theme: 'crimson',
 }
 
 const SAMPLE_WORDS: Record<string, CategoryWord[]> = {

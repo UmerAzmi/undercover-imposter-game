@@ -9,6 +9,7 @@ const KEYS = {
   lastPlayed: 'imposter:lastPlayed',
   customCategories: 'imposter:customCategories',
   sessionScore: 'imposter:sessionScore',
+  playerColors: 'imposter:playerColors',
 } as const
 
 export function todayISO(now: Date = new Date()): string {
@@ -41,7 +42,7 @@ export const DEFAULT_SETTINGS: Settings = {
   voteMode: 'group',
   soundEnabled: true,
   hapticsEnabled: true,
-  theme: 'rose',
+  theme: 'crimson',
 }
 
 function safeGet(key: string): unknown {
@@ -69,6 +70,19 @@ export function loadPlayers(): string[] {
 }
 export function savePlayers(players: string[]) { safeSet(KEYS.players, players) }
 
+export function loadPlayerColors(): Record<string, string> {
+  const v = safeGet(KEYS.playerColors)
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return {}
+  const res: Record<string, string> = {}
+  for (const [k, val] of Object.entries(v)) {
+    if (typeof val === 'string') res[k] = val
+  }
+  return res
+}
+export function savePlayerColors(colors: Record<string, string>) {
+  safeSet(KEYS.playerColors, colors)
+}
+
 const KNOWN_CATEGORIES = new Set<string>(CATEGORY_IDS)
 
 export function loadCategories(): string[] {
@@ -86,7 +100,17 @@ function clampNumber(value: unknown, fallback: number, min: number, max: number)
 // Pre-migration default — anything else stored is treated as a deliberate
 // host override so we don't trample existing custom round lengths.
 const LEGACY_DEFAULT_ROUND_SECONDS = 180
-const VALID_THEMES = new Set<ThemeColor>(['rose', 'neon', 'blue', 'purple', 'amber'])
+const VALID_THEMES = new Set<ThemeColor>([
+  'crimson',
+  'emerald',
+  'cyan',
+  'violet',
+  'amber',
+  'rose',
+  'neon',
+  'blue',
+  'purple',
+])
 
 export function loadSettings(): Settings {
   const v = safeGet(KEYS.settings) as Partial<Settings> | undefined
@@ -111,7 +135,7 @@ export function saveSettings(s: Settings) { safeSet(KEYS.settings, s) }
 
 export function loadLocale(): Locale | null {
   const v = safeGet(KEYS.locale)
-  if (v === 'nl-BE' || v === 'en') return v
+  if (v === 'en') return 'en'
   return null
 }
 export function saveLocale(locale: Locale) { safeSet(KEYS.locale, locale) }

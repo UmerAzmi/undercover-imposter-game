@@ -4,14 +4,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: '#0b0d12',
-        surface: '#161922',
-        card: '#1f2330',
-        line: '#2a2f3d',
-        muted: '#9aa3b2',
+        ink: '#07090e',
+        surface: '#0d1017',
+        card: '#121620',
+        line: '#1c2230',
+        muted: '#818c9f',
         accent: 'rgb(var(--color-accent-rgb) / <alpha-value>)',
-        success: '#41d488',
-        danger: '#ef4444',
+        success: '#10b981',
+        danger: '#f43f5e',
       },
       fontFamily: {
         sans: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],

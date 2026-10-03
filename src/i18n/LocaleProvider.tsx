@@ -25,24 +25,10 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setBundle(null)
     setLoadError(false)
-    loadLocaleBundle(locale)
+    loadLocaleBundle('en')
       .then((b) => { if (!cancelled) setBundle(b) })
-      .catch(async () => {
-        if (cancelled) return
-        // Fall back to the other shipped locale so users aren't stuck on "…",
-        // and persist the fallback so a broken stored locale doesn't keep failing
-        // on every launch.
-        const fallback: Locale = locale === 'en' ? 'nl-BE' : 'en'
-        try {
-          const b = await loadLocaleBundle(fallback)
-          if (!cancelled) {
-            setBundle(b)
-            setLocaleState(fallback)
-            saveLocale(fallback)
-          }
-        } catch {
-          if (!cancelled) setLoadError(true)
-        }
+      .catch(() => {
+        if (!cancelled) setLoadError(true)
       })
     return () => { cancelled = true }
   }, [locale])

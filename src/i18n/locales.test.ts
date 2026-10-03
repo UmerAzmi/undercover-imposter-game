@@ -12,32 +12,10 @@ afterEach(() => {
 })
 
 describe('detectLocale', () => {
-  it('returns nl-BE when navigator.language starts with "nl"', () => {
-    setLanguage('nl-BE')
-    expect(detectLocale()).toBe('nl-BE')
-  })
-
-  it('returns nl-BE for plain "nl"', () => {
-    setLanguage('nl')
-    expect(detectLocale()).toBe('nl-BE')
-  })
-
-  it('returns nl-BE for nl-NL (any Dutch variant maps to nl-BE)', () => {
-    setLanguage('nl-NL')
-    expect(detectLocale()).toBe('nl-BE')
-  })
-
-  it('is case-insensitive on the language tag', () => {
-    setLanguage('NL-be')
-    expect(detectLocale()).toBe('nl-BE')
-  })
-
-  it('falls back to en for any non-Dutch locale', () => {
+  it('returns en by default', () => {
     setLanguage('en-US')
     expect(detectLocale()).toBe('en')
-    setLanguage('fr-FR')
-    expect(detectLocale()).toBe('en')
-    setLanguage('de-DE')
+    setLanguage('nl-BE')
     expect(detectLocale()).toBe('en')
   })
 })

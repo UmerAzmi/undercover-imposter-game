@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Screen } from '../components/Screen'
 import { Button } from '../components/Button'
+import { ScrollArea } from '../components/ScrollArea'
 import { useT } from '../i18n/LocaleProvider'
 
 type Props = {
@@ -32,7 +33,12 @@ export function VoteScreen({ voterName, voterIndex, players, candidateIndices, o
         <p className="text-white/60 mt-3">{t('vote.prompt')}</p>
       </div>
 
-      <div role="group" aria-label={t('vote.prompt')} className="flex-1 scroll-smooth-y space-y-2 pb-2">
+      <ScrollArea
+        role="group"
+        aria-label={t('vote.prompt')}
+        className="flex-1 min-h-0"
+        contentClassName="space-y-2 pb-2 pr-2"
+      >
         {candidateIndices.map((i) => {
           if (i === voterIndex) return null
           const isSel = selected === i
@@ -51,7 +57,7 @@ export function VoteScreen({ voterName, voterIndex, players, candidateIndices, o
             </button>
           )
         })}
-      </div>
+      </ScrollArea>
     </Screen>
   )
 }

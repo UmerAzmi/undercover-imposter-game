@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Screen } from '../components/Screen'
 import { Button } from '../components/Button'
 import { ScreenHeader } from '../components/ScreenHeader'
+import { ScrollArea } from '../components/ScrollArea'
 import { useLocale, useT } from '../i18n/LocaleProvider'
 import { CATEGORY_IDS } from '../i18n/locales'
 import type { CategoryWord, CustomCategory } from '../game/types'
@@ -37,7 +38,7 @@ export function CategoriesScreen({
           <Button onClick={onContinue} disabled={!canContinue}>
             <span className="flex items-center justify-between w-full">
               <span>{t('categories.continue')}</span>
-              <span className="text-sm font-normal text-ink/60">
+              <span className="text-sm font-medium text-white/80">
                 {t('categories.countSuffix', { count: selected.length })}
               </span>
             </span>
@@ -46,7 +47,7 @@ export function CategoriesScreen({
       >
         <ScreenHeader title={t('categories.title')} onBack={onBack} />
 
-        <div className="flex-1 scroll-smooth-y space-y-3 pb-2">
+        <ScrollArea className="flex-1 min-h-0" contentClassName="space-y-3 pr-2 pb-2">
           {/* Button to open New Category modal */}
           <button
             type="button"
@@ -150,7 +151,7 @@ export function CategoriesScreen({
               </button>
             )
           })}
-        </div>
+        </ScrollArea>
       </Screen>
 
       {showModal && (
@@ -237,7 +238,7 @@ function CreateCategoryModal({
           </button>
         </div>
 
-        <div className="flex-1 scroll-smooth-y space-y-3 pr-1">
+        <ScrollArea className="flex-1 min-h-0" contentClassName="space-y-3 pr-2 pb-2">
           <div className="grid grid-cols-[3.5rem_1fr] gap-2">
             <div>
               <label className="text-xs text-white/50 block mb-1">{t('categories.modal.emoji')}</label>
@@ -317,7 +318,7 @@ function CreateCategoryModal({
               </p>
             )}
           </div>
-        </div>
+        </ScrollArea>
 
         <div className="flex gap-2 pt-2 border-t border-line">
           <Button variant="secondary" size="md" onClick={onClose} className="flex-1">

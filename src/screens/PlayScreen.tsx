@@ -1,174 +1,134 @@
-import { useEffect, useRef, useState } from 'react'
 import { Screen } from '../components/Screen'
 import { Button } from '../components/Button'
 import { ExitRoundButton } from '../components/ExitRoundButton'
-import { WaveFill } from '../components/WaveFill'
-import { useLocale, useT } from '../i18n/LocaleProvider'
-import { formatTime } from '../game/format'
-import { playCountdownTick, playRoundEndCue, preloadRoundEndCue } from '../lib/sound'
+import { ScrollArea } from '../components/ScrollArea'
+import { useLocale } from '../i18n/LocaleProvider'
+import { getPlayerColor } from '../lib/playerColors'
 
 type Props = {
-  totalSeconds: number
   categoryId: string
   categoryName?: string
   categoryEmoji?: string
   starterName: string
-  soundEnabled?: boolean
-  hapticsEnabled?: boolean
+  starterColor?: string
   onFinish: () => void
   onAbort: () => void
 }
 
-type WakeLockSentinel = {
-  released: boolean
-  release: () => Promise<void>
-  addEventListener: (type: 'release', listener: () => void) => void
-  removeEventListener: (type: 'release', listener: () => void) => void
-}
-type NavigatorWithWakeLock = Navigator & {
-  wakeLock?: { request: (type: 'screen') => Promise<WakeLockSentinel> }
-}
-
 export function PlayScreen({
-  totalSeconds,
   categoryId,
   categoryName,
   categoryEmoji,
   starterName,
-  soundEnabled = true,
-  hapticsEnabled = true,
+  starterColor,
   onFinish,
   onAbort,
 }: Props) {
-  const t = useT()
   const { bundle } = useLocale()
   const meta = bundle?.categories[categoryId]
-  const [remaining, setRemaining] = useState(totalSeconds)
+  const color = getPlayerColor(starterColor)
 
-  // Tick every 100ms so the digit display and wave-fill height stay in sync
-  // and countdown ticks trigger precisely on the second.
-  useEffect(() => {
-    preloadRoundEndCue()
-
-    let stopped = false
-    let lastTickSecond = -1
-    const startedAt = performance.now()
-    const id = window.setInterval(() => {
-      if (stopped) return
-      const elapsed = (performance.now() - startedAt) / 1000
-      const left = Math.max(0, totalSeconds - elapsed)
-      setRemaining(left)
-
-      const wholeSecond = Math.ceil(left)
-      if (wholeSecond <= 10 && wholeSecond > 0 && wholeSecond !== lastTickSecond) {
-        lastTickSecond = wholeSecond
-        playCountdownTick(wholeSecond, soundEnabled, hapticsEnabled)
-      }
-
-      if (left <= 0) {
-        stopped = true
-        clearInterval(id)
-        playRoundEndCue(soundEnabled, hapticsEnabled)
-      }
-    }, 100)
-    return () => { stopped = true; clearInterval(id) }
-  }, [totalSeconds, soundEnabled, hapticsEnabled])
-
-  // Wake lock: hold the screen on for the duration of this round.
-  // Reacquire when the page becomes visible again (the spec drops the lock when
-  // the page hides), and also when the sentinel emits its own 'release' event —
-  // some browsers drop the lock for reasons beyond visibility. Cleanup releases
-  // defensively so a quick mount/unmount under StrictMode doesn't leak.
-  const sentinelRef = useRef<WakeLockSentinel | null>(null)
-  useEffect(() => {
-    let cancelled = false
-    const nav = navigator as NavigatorWithWakeLock
-    if (!nav.wakeLock) return
-
-    const onSentinelReleased = () => {
-      sentinelRef.current = null
-      if (!cancelled && document.visibilityState === 'visible') acquire()
-    }
-
-    const acquire = async () => {
-      try {
-        const sentinel = await nav.wakeLock!.request('screen')
-        if (cancelled) {
-          sentinel.release().catch(() => {})
-          return
-        }
-        sentinel.addEventListener('release', onSentinelReleased)
-        sentinelRef.current = sentinel
-      } catch {
-        /* user gesture missing or denied; ignore */
-      }
-    }
-
-    const onVisible = () => {
-      if (document.visibilityState !== 'visible') return
-      if (sentinelRef.current && !sentinelRef.current.released) return
-      acquire()
-    }
-
-    acquire()
-    document.addEventListener('visibilitychange', onVisible)
-
-    return () => {
-      cancelled = true
-      document.removeEventListener('visibilitychange', onVisible)
-      const sentinel = sentinelRef.current
-      sentinelRef.current = null
-      if (sentinel) {
-        sentinel.removeEventListener('release', onSentinelReleased)
-        sentinel.release().catch(() => {})
-      }
-    }
-  }, [])
-
-  const expired = remaining <= 0
-
-  if (expired) {
-    return (
-      <Screen footer={<Button onClick={onFinish}>{t('play.startVote')}</Button>}>
-        <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 px-4">
-          <div className="text-7xl" aria-hidden>⏰</div>
-          <h1 className="text-5xl font-extrabold tracking-tight">{t('play.timeUp')}</h1>
-          <p className="text-white/70 max-w-xs">{t('play.timeUpSubtitle')}</p>
-        </div>
-      </Screen>
-    )
-  }
-
-  // Fill rises from 0% (full screen) to 100% (touching the top) as the round runs.
-  const filledPercent = Math.min(100, Math.max(0, ((totalSeconds - remaining) / totalSeconds) * 100))
-
-  // While the timer is running there is no "skip to vote" button — to prevent
-  // accidental taps that throw the round away. The only escape hatch is the
-  // top-right ✕ which routes back to settings.
   return (
-    <Screen>
-      <WaveFill percent={filledPercent} />
-
+    <Screen
+      footer={
+        <Button onClick={onFinish}>
+          Proceed to Vote
+        </Button>
+      }
+    >
       <ExitRoundButton onConfirm={onAbort} />
 
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center gap-3">
-        <div className="text-white/60 uppercase tracking-widest text-xs">
-          {t('play.category')}
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-3xl" aria-hidden>{categoryEmoji ?? meta?.emoji ?? '❓'}</span>
-          <span className="text-2xl font-bold">{categoryName ?? meta?.name ?? categoryId}</span>
-        </div>
-        <div className="mt-8 text-7xl font-extrabold tabular-nums tracking-tight">
-          {formatTime(Math.ceil(remaining))}
-        </div>
-        <div className="mt-4 text-xl font-semibold max-w-xs leading-snug">
-          {t('play.starter', { name: starterName })}
-        </div>
-        <div className="text-white/60 mt-1 max-w-xs leading-snug text-sm">
-          {t('play.instructions')}
+      {/* Screen Title & Category */}
+      <div className="text-center pt-2 pb-1 relative">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-line/60 border border-white/10 text-xs font-semibold text-white/80">
+          <span className="text-base select-none" aria-hidden>
+            {categoryEmoji ?? meta?.emoji ?? '❓'}
+          </span>
+          <span>{categoryName ?? meta?.name ?? categoryId}</span>
         </div>
       </div>
+
+      <ScrollArea className="flex-1 min-h-0" contentClassName="space-y-3.5 py-2 pr-2">
+        {/* Hero Card: Random Starter Player */}
+        <div className="relative rounded-3xl bg-card border border-line p-5 text-center shadow-xl overflow-hidden">
+          {/* Ambient player color glow */}
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full blur-[70px] pointer-events-none opacity-20 -z-0"
+            style={{ backgroundColor: color }}
+            aria-hidden
+          />
+
+          <div className="relative z-10 space-y-2">
+            <span className="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/5 border border-white/10 text-accent">
+              First Speaker
+            </span>
+
+            {/* Glowing Starter Ring */}
+            <div className="flex justify-center my-1">
+              <div
+                className="w-16 h-16 rounded-full border-2 flex items-center justify-center shadow-lg text-2xl font-black transition-transform"
+                style={{
+                  borderColor: color,
+                  backgroundColor: `${color}20`,
+                  color: '#ffffff',
+                }}
+              >
+                {starterName.charAt(0).toUpperCase()}
+              </div>
+            </div>
+
+            <h1
+              className="text-3xl sm:text-4xl font-black tracking-tight drop-shadow-sm"
+              style={{ color }}
+            >
+              {starterName}
+            </h1>
+
+            <p className="text-sm font-semibold text-white/80">
+              Starts the round!
+            </p>
+          </div>
+        </div>
+
+        {/* Turn Order Instructions Card */}
+        <div className="rounded-3xl bg-card border border-line p-4 space-y-3 shadow-lg">
+          <div className="flex items-center gap-2 pb-1 border-b border-line/60">
+            <span className="text-xl" aria-hidden>🔄</span>
+            <h2 className="text-sm font-bold text-white tracking-wide uppercase">
+              Turn Order & Rules
+            </h2>
+          </div>
+
+          <div className="space-y-2.5 text-xs text-white/80 leading-relaxed">
+            <div className="flex items-start gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-accent/20 border border-accent/40 text-accent font-bold flex items-center justify-center shrink-0 mt-0.5 text-[11px]">
+                1
+              </span>
+              <p>
+                Begin with <strong className="text-white" style={{ color }}>{starterName}</strong>, then proceed <strong>clockwise</strong> around the circle.
+              </p>
+            </div>
+
+            <div className="flex items-start gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-accent/20 border border-accent/40 text-accent font-bold flex items-center justify-center shrink-0 mt-0.5 text-[11px]">
+                2
+              </span>
+              <p>
+                Each player says <strong>one single word</strong> describing their secret word. The undercover imposter must bluff along!
+              </p>
+            </div>
+
+            <div className="flex items-start gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-accent/20 border border-accent/40 text-accent font-bold flex items-center justify-center shrink-0 mt-0.5 text-[11px]">
+                3
+              </span>
+              <p>
+                Discuss and interrogate freely without timers. When your group has found their suspects, tap below to start voting.
+              </p>
+            </div>
+          </div>
+        </div>
+      </ScrollArea>
     </Screen>
   )
 }

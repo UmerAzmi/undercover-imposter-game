@@ -4,8 +4,8 @@
 
 :root {
   color-scheme: dark;
-  --color-accent-rgb: 255 85 119;
-  --color-accent: #ff5577;
+  --color-accent-rgb: 244 63 94;
+  --color-accent: #f43f5e;
   --safe-t: env(safe-area-inset-top);
   --safe-b: env(safe-area-inset-bottom);
   /* iOS-style spring-ish easing — used for nav transitions and tap feedback */
@@ -15,7 +15,7 @@
 
 html, body, #root {
   height: 100%;
-  background: #0b0d12;
+  background: #05070a;
   color: #f3f4f6;
   font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -55,6 +55,62 @@ button {
     overflow-y: auto;
     overscroll-behavior: contain;
   }
+  .hide-scrollbar {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  .scroll-smooth-y::-webkit-scrollbar,
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  .scroll-smooth-y::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scroll-smooth-y::-webkit-scrollbar-button,
+  ::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  /* Permanently visible sleek accent pill (not big, not invisible) */
+  .scroll-smooth-y::-webkit-scrollbar-thumb,
+  ::-webkit-scrollbar-thumb {
+    background: rgba(var(--color-accent-rgb), 0.55);
+    border-radius: 9999px;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  /* Illuminates fully when hovered, active, or during active scrolling */
+  .scroll-smooth-y:hover::-webkit-scrollbar-thumb,
+  .scroll-smooth-y:active::-webkit-scrollbar-thumb,
+  .scroll-smooth-y:focus-within::-webkit-scrollbar-thumb,
+  .scroll-smooth-y.is-scrolling::-webkit-scrollbar-thumb,
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent, #f43f5e);
+    box-shadow: 0 0 6px rgba(var(--color-accent-rgb), 0.5);
+  }
+
+  /* Firefox support */
+  @supports (-moz-appearance: none) {
+    .scroll-smooth-y,
+    html,
+    body {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(var(--color-accent-rgb), 0.55) transparent;
+      transition: scrollbar-color 0.2s ease-in-out;
+    }
+    .scroll-smooth-y:hover,
+    .scroll-smooth-y:active,
+    .scroll-smooth-y.is-scrolling {
+      scrollbar-color: var(--color-accent, #f43f5e) transparent;
+    }
+  }
 
   /* Shared iOS-style tap feedback. Components keep their own colour transitions
      and add this class for the press scale + matching easing. */
@@ -74,17 +130,23 @@ button {
    Falls back to a plain swap on browsers that don't support startViewTransition. */
 
 ::view-transition-old(root),
-::view-transition-new(root) {
+::view-transition-new(root),
+::view-transition-old(app-screen),
+::view-transition-new(app-screen) {
   animation-duration: var(--nav-duration);
   animation-timing-function: var(--ios-ease);
   animation-fill-mode: both;
 }
 
-::view-transition-old(root) { animation-name: ios-slide-out-left; }
-::view-transition-new(root) { animation-name: ios-slide-in-right; }
+::view-transition-old(root),
+::view-transition-old(app-screen) { animation-name: ios-slide-out-left; }
+::view-transition-new(root),
+::view-transition-new(app-screen) { animation-name: ios-slide-in-right; }
 
-html[data-nav="back"]::view-transition-old(root) { animation-name: ios-slide-out-right; }
-html[data-nav="back"]::view-transition-new(root) { animation-name: ios-slide-in-left; }
+html[data-nav="back"]::view-transition-old(root),
+html[data-nav="back"]::view-transition-old(app-screen) { animation-name: ios-slide-out-right; }
+html[data-nav="back"]::view-transition-new(root),
+html[data-nav="back"]::view-transition-new(app-screen) { animation-name: ios-slide-in-left; }
 
 @keyframes ios-slide-in-right {
   from { transform: translateX(100%); }

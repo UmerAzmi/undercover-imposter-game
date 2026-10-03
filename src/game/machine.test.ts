@@ -71,7 +71,7 @@ describe('initialState', () => {
     const s = initialState()
     expect(s.players).toEqual(['Alex', 'Sam'])
     expect(s.selectedCategoryIds).toEqual(['party'])
-    expect(s.settings).toEqual({ imposterCount: 1, roundSeconds: 90, roundSecondsCustom: true, hintsEnabled: false, voteMode: 'group', soundEnabled: true, hapticsEnabled: true, theme: 'rose' })
+    expect(s.settings).toEqual({ imposterCount: 1, roundSeconds: 90, roundSecondsCustom: true, hintsEnabled: false, voteMode: 'group', soundEnabled: true, hapticsEnabled: true, theme: 'crimson' })
   })
 
   it('clamps stored imposterCount that exceeds player count - 1', () => {

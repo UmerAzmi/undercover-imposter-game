@@ -1,8 +1,8 @@
-export type Locale = 'nl-BE' | 'en'
+export type Locale = 'en'
 
 export type VoteMode = 'individual' | 'group'
 
-export type ThemeColor = 'rose' | 'neon' | 'blue' | 'purple' | 'amber'
+export type ThemeColor = 'crimson' | 'emerald' | 'cyan' | 'violet' | 'amber' | 'rose' | 'neon' | 'blue' | 'purple'
 
 export type Settings = {
   imposterCount: number

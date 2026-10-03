@@ -1,6 +1,6 @@
 # Design source files
 
-`icon-source.png` is the master 1024×1024 RGBA artwork (a pair of theatre masks on a transparent background) used to derive every PWA / favicon / apple-touch icon shipped under `public/`.
+`icon-source.png` is the master 1024×1024 RGBA artwork (a stealth secret agent with fedora and sunglasses against an obsidian noir background) used to derive every PWA / favicon / apple-touch icon shipped under `public/`.
 
 ## Regenerating the icons
 

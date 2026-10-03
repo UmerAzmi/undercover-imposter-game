@@ -9,10 +9,14 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-white text-ink active:bg-white/90 disabled:bg-white/30 disabled:text-ink/40',
-  secondary: 'bg-card text-white border border-line active:bg-line',
-  ghost: 'bg-transparent text-white active:bg-white/10',
-  danger: 'bg-danger text-white active:bg-danger/90',
+  primary:
+    'bg-gradient-to-r from-accent via-accent to-accent/90 text-white font-bold tracking-tight shadow-[0_0_24px_rgba(var(--color-accent-rgb),0.35)] border border-white/20 hover:border-white/35 active:scale-[0.985] disabled:opacity-35 disabled:shadow-none disabled:cursor-not-allowed',
+  secondary:
+    'bg-card/90 text-white border border-line/80 hover:border-white/30 shadow-md active:bg-line active:scale-[0.985]',
+  ghost:
+    'bg-white/[0.04] text-white/80 hover:text-white hover:bg-white/[0.08] border border-white/[0.08] active:scale-[0.985]',
+  danger:
+    'bg-gradient-to-r from-danger to-danger/90 text-white font-bold tracking-tight shadow-[0_0_24px_rgba(244,63,94,0.35)] border border-white/20 active:scale-[0.985]',
 }
 
 export function Button({

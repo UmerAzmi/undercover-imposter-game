@@ -19,10 +19,23 @@ export function HomeScreen({ onStart, onOpenSettings, banner, sessionScore, onRe
 
   return (
     <Screen>
-      <div className="flex-1 flex flex-col items-center justify-center text-center gap-5">
-        <div className="text-7xl" aria-hidden>🎭</div>
-        <h1 className="text-5xl font-extrabold tracking-tight">{t('home.title')}</h1>
-        <p className="text-white/70 max-w-xs">{t('home.subtitle')}</p>
+      <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 sm:gap-5 py-2">
+        <div className="relative group">
+          <div
+            className="absolute -inset-2 rounded-3xl bg-accent/25 blur-xl opacity-75 group-hover:opacity-100 transition duration-500"
+            aria-hidden
+          />
+          <img
+            src="/icon-192.png"
+            alt="Undercover: The Imposter Game Logo"
+            className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl shadow-2xl border border-white/10 object-cover"
+          />
+        </div>
+        <div className="space-y-1">
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white">{t('home.title')}</h1>
+          <p className="text-xs uppercase tracking-widest text-accent font-bold">The Imposter Game</p>
+        </div>
+        <p className="text-white/70 max-w-xs text-sm sm:text-base">{t('home.subtitle')}</p>
 
         {hasScores && (
           <div className="mt-1 w-full max-w-xs bg-card border border-line rounded-2xl p-3 flex items-center justify-between text-xs">

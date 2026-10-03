@@ -9,9 +9,11 @@ type Props = {
   prompt: string
   children: ReactNode
   onFullyRevealed?: () => void
+  /** Custom wave fill color during the hold */
+  fillColor?: string
 }
 
-export function HoldToReveal({ prompt, children, onFullyRevealed }: Props) {
+export function HoldToReveal({ prompt, children, onFullyRevealed, fillColor }: Props) {
   const [revealed, setRevealed] = useState(false)
   const [holding, setHolding] = useState(false)
   const timeoutRef = useRef<number | null>(null)
@@ -62,6 +64,7 @@ export function HoldToReveal({ prompt, children, onFullyRevealed }: Props) {
       <WaveFill
         percent={holding ? 100 : 0}
         transitionMs={holding ? HOLD_MS : RELEASE_MS}
+        fillColor={fillColor}
       />
       {revealed ? (
         <div className="relative z-10 w-full px-6 text-center">{children}</div>

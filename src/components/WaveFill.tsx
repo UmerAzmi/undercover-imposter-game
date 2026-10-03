@@ -3,6 +3,8 @@ type Props = {
   percent: number
   /** Smoothing for the height update between progress ticks. Default 300ms. */
   transitionMs?: number
+  /** Optional custom fill color (hex or CSS var). Defaults to accent color. */
+  fillColor?: string
 }
 
 /**
@@ -15,7 +17,8 @@ type Props = {
  * The component is `position: absolute; inset: 0` and ignores pointer events,
  * so any parent `relative` container can drop it in as a background layer.
  */
-export function WaveFill({ percent, transitionMs = 300 }: Props) {
+export function WaveFill({ percent, transitionMs = 300, fillColor }: Props) {
+  const color = fillColor ?? 'var(--color-accent, #f43f5e)'
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
       <div
@@ -34,7 +37,7 @@ export function WaveFill({ percent, transitionMs = 300 }: Props) {
         >
           <path
             d="M0 12 Q 25 4, 50 12 T 100 12 T 150 12 T 200 12 V 20 H 0 Z"
-            fill="var(--color-accent, #ff5577)"
+            fill={color}
             fillOpacity="0.25"
           />
         </svg>
@@ -46,12 +49,15 @@ export function WaveFill({ percent, transitionMs = 300 }: Props) {
         >
           <path
             d="M0 10 Q 25 18, 50 10 T 100 10 T 150 10 T 200 10 V 20 H 0 Z"
-            fill="var(--color-accent, #ff5577)"
+            fill={color}
             fillOpacity="0.45"
           />
         </svg>
         {/* Body of the fill below the waves */}
-        <div className="absolute inset-x-0 top-5 bottom-0 bg-accent/30" />
+        <div
+          className="absolute inset-x-0 top-5 bottom-0"
+          style={{ backgroundColor: color, opacity: 0.3 }}
+        />
       </div>
     </div>
   )

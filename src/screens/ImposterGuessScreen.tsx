@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Screen } from '../components/Screen'
 import { Button } from '../components/Button'
+import { ScrollArea } from '../components/ScrollArea'
 import { useT } from '../i18n/LocaleProvider'
 import type { CategoryWord } from '../game/types'
 
@@ -28,7 +29,7 @@ export function ImposterGuessScreen({ imposterName, words, onGuess }: Props) {
         <p className="text-white/70 mt-3 leading-snug max-w-xs mx-auto">{t('guess.prompt')}</p>
       </div>
 
-      <div className="flex-1 scroll-smooth-y pb-2">
+      <ScrollArea className="flex-1 min-h-0" contentClassName="pb-2 pr-2">
         <div role="group" aria-label={t('guess.prompt')} className="grid grid-cols-2 gap-2">
           {words.map(({ word }) => (
             <button
@@ -47,7 +48,7 @@ export function ImposterGuessScreen({ imposterName, words, onGuess }: Props) {
             </button>
           ))}
         </div>
-      </div>
+      </ScrollArea>
     </Screen>
   )
 }

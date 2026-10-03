@@ -9,7 +9,6 @@ export type LocaleBundle = {
 }
 
 export const AVAILABLE_LOCALES: { code: Locale; label: string }[] = [
-  { code: 'nl-BE', label: 'Vlaams' },
   { code: 'en', label: 'English' },
 ]
 
@@ -48,7 +47,5 @@ export async function loadLocaleBundle(locale: Locale): Promise<LocaleBundle> {
 }
 
 export function detectLocale(): Locale {
-  const lang = (typeof navigator !== 'undefined' && navigator.language) || 'nl-BE'
-  if (lang.toLowerCase().startsWith('nl')) return 'nl-BE'
   return 'en'
 }

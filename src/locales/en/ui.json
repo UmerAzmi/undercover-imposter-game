@@ -1,8 +1,8 @@
 {
   "common.back": "Back",
 
-  "home.title": "Imposter",
-  "home.subtitle": "One device. One secret word. Find the imposter.",
+  "home.title": "Undercover",
+  "home.subtitle": "One secret word. Find who is undercover.",
   "home.start": "Play",
   "home.settingsLink": "Settings",
 
@@ -17,7 +17,7 @@
   "players.staleHint": "Last played on {date}. Confirm or edit the list before continuing.",
 
   "categories.title": "Categories",
-  "categories.continue": "Play",
+  "categories.continue": "Continue",
   "categories.countSuffix": "{count} selected",
 
   "settings.title": "Game settings",

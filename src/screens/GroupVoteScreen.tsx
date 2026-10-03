@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Screen } from '../components/Screen'
 import { Button } from '../components/Button'
+import { ScrollArea } from '../components/ScrollArea'
 import { useT } from '../i18n/LocaleProvider'
 
 type Props = {
@@ -28,7 +29,12 @@ export function GroupVoteScreen({ players, onConfirm }: Props) {
         <p className="text-white/70 mt-2 max-w-sm mx-auto">{t('groupVote.prompt')}</p>
       </div>
 
-      <div role="group" aria-label={t('groupVote.prompt')} className="flex-1 scroll-smooth-y space-y-2 pb-2">
+      <ScrollArea
+        role="group"
+        aria-label={t('groupVote.prompt')}
+        className="flex-1 min-h-0"
+        contentClassName="space-y-2 pb-2 pr-2"
+      >
         {players.map((name, i) => {
           const isSel = selected === i
           return (
@@ -46,7 +52,7 @@ export function GroupVoteScreen({ players, onConfirm }: Props) {
             </button>
           )
         })}
-      </div>
+      </ScrollArea>
     </Screen>
   )
 }

@@ -1,6 +1,6 @@
-# Imposter Game
+# Undercover: The Imposter Game
 
-A single-device "find the imposter" party game built by **Umer Azmi**. Pass the phone around: everyone holds to reveal their secret word, except one player who sees `IMPOSTER` and has to bluff. After the round timer, vote anonymously and unmask them.
+A single-device "find the undercover imposter" social deduction party game built by **Umer Azmi**. Pass the phone around: everyone holds to reveal their secret word, except the undercover player who has to bluff. After the round timer, vote anonymously or as a group to unmask them.
 
 Installable as a PWA, fully offline once loaded. No tracking, no analytics, no accounts; everything runs client-side and nothing ever leaves the device (player names, custom categories, scores, and settings live in `localStorage`).
 
@@ -38,7 +38,7 @@ To add a new language, drop a folder next to `nl-BE/` and `en/` mirroring its st
 
 ## Licence
 
-MIT. The theatre-masks app icon is a custom AI-generated illustration; the source PNG and regeneration steps live in [`design/`](design/).
+MIT. The stealth agent app icon is a custom AI-generated illustration; the source PNG lives in [`design/`](design/).
 
 ## Changelog
 
